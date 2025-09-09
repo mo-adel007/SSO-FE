@@ -6,61 +6,51 @@ const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [loading, setLoading] = useState(true);
 
-  // Fetch user data using the current token
-  const fetchUser = useCallback(async (authToken) => {
-    if (!authToken) {
-      setLoading(false);
-      return;
-    }
-
+  // Fetch user data using session
+  const fetchUser = useCallback(async () => {
+    setLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/me`, {
-        headers: { Authorization: `Bearer ${authToken}` },
+      const response = await fetch(`${API_BASE_URL}/auth/session/me`, {
+        credentials: 'include',
       });
-
       if (response.ok) {
         const userData = await response.json();
         setUser(userData);
       } else {
-        // Token is invalid
         setUser(null);
-        localStorage.removeItem("token");
-        setToken(null);
       }
     } catch (error) {
-      console.error("Failed to fetch user:", error);
+      console.error("Failed to fetch user (session):", error);
       setUser(null);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // AuthContext.js
-  const login = useCallback((authToken, userData) => {
-    setToken(authToken);
-    setUser(userData);
-    localStorage.setItem("token", authToken);
-    localStorage.setItem("user", JSON.stringify(userData));
-  }, []);
+  // Login just triggers a user fetch (session is set by backend)
+  const login = useCallback(() => {
+    fetchUser();
+  }, [fetchUser]);
 
-  const logout = useCallback(() => {
-    setToken(null);
+  // Logout calls backend and clears user
+  const logout = useCallback(async () => {
+    try {
+      await fetch(`${API_BASE_URL}/auth/logout`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch {}
     setUser(null);
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
   }, []);
 
-  // Fetch user when token changes
   useEffect(() => {
-    fetchUser(token);
-  }, [token, fetchUser]);
+    fetchUser();
+  }, [fetchUser]);
 
   const value = {
     user,
-    token,
     loading,
     login,
     logout,

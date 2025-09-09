@@ -7,51 +7,37 @@ import { useAuth } from '../hooks/useAuth';
 const LoginSuccess = () => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const navigate = useNavigate();
-  const { user, token, logout } = useAuth();
+  const { user, logout } = useAuth();
 
   useEffect(() => {
-    if (!token || !user) {
+    if (!user) {
       navigate('/login', { replace: true });
     }
-  }, [token, user, navigate]);
+  }, [user, navigate]);
 
+  // No token to copy in session/cookie mode
   const handleCopyToken = () => {
-    if (token) {
-      navigator.clipboard.writeText(token);
-      toast.success('Token copied to clipboard!');
-    }
+    toast('No token available in session mode.');
   };
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      // Call the backend logout endpoint
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          toast.success('Logged out successfully!');
-        }
-      }
+      await logout();
+      toast.success('Logged out successfully!');
+      navigate('/login', { replace: true });
     } catch (error) {
       console.error('Logout error:', error);
-      // Still proceed with client-side logout even if backend fails
       toast.success('Logged out successfully!');
+      navigate('/login', { replace: true });
     } finally {
-      logout();
       setIsLoggingOut(false);
     }
   };
 
   const handleTryAgain = () => {
     logout();
+    navigate('/login', { replace: true });
   };
 
   return (
@@ -99,17 +85,7 @@ const LoginSuccess = () => {
               </div>
             </div>
             
-            {token && (
-              <div className="bg-blue-50 rounded-lg p-4">
-                <h3 className="text-sm font-medium text-blue-700 mb-2">Authentication Token</h3>
-                <div className="bg-white rounded border p-3">
-                  <code className="text-xs text-gray-800 break-all font-mono">
-                    {token}
-                  </code>
-                </div>
-                <p className="text-xs text-blue-600 mt-2">This token is stored in localStorage and can be used for API calls</p>
-              </div>
-            )}
+            {/* No token display in session/cookie mode */}
           </div>
           
           <div className="mt-6 flex flex-col gap-3">

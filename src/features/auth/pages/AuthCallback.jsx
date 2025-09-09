@@ -21,23 +21,9 @@ const AuthCallback = () => {
 
       if (token) {
         try {
-          const response = await fetch(
-            `${import.meta.env.VITE_API_URL}/auth/me`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
-          if (response.ok) {
-            const userData = await response.json();
-            login(token, userData); // update context immediately
-            toast.success("Successfully signed in!");
-            navigate("/dashboard", { replace: true });
-          } else {
-            throw new Error("Failed to get user information");
-          }
+          await login(); // session-based login, context will fetch user
+          toast.success("Successfully signed in!");
+          navigate("/dashboard", { replace: true });
         } catch (error) {
           console.error("Auth callback error:", error);
           toast.error("Authentication failed");
