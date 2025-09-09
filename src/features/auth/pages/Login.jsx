@@ -1,40 +1,41 @@
-import React from 'react';
+import { useAuth } from '../hooks/useAuth';
 import { useGoogleAuth } from '../hooks/useGoogleAuth';
+import { usePlexAuth } from '../hooks/usePlexAuth';
 import LoginForm from '../components/LoginForm';
-import LoginSuccess from '../components/LoginSuccess';
+import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import LoadingScreen from '../../../shared/components/LoadingScreen';
 
 const Login = () => {
-  const {
-    isLoading,
-    isInitializing,
-    loginSuccess,
-    userInfo,
-    authToken,
-    handleGoogleLogin,
-    resetAuth
-  } = useGoogleAuth();
+  const { user, token, loading } = useAuth();
+  const navigate = useNavigate();
+  const googleAuth = useGoogleAuth();
+  const plexAuth = usePlexAuth();
 
-  // Show loading spinner while checking for existing authentication
-  if (isInitializing) {
+  // If user is already authenticated, redirect to dashboard
+  useEffect(() => {
+    if (!loading && user && token) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [loading, user, token, navigate]);
+
+  // Check if either auth method is initializing
+  if (loading || googleAuth.isInitializing || plexAuth.isInitializing) {
     return <LoadingScreen message="Checking authentication..." />;
   }
 
-  // Show success screen if login was successful
-  if (loginSuccess && userInfo) {
-    return (
-      <LoginSuccess
-        userInfo={userInfo}
-        authToken={authToken}
-        onReset={resetAuth}
-      />
-    );
+  // If already authenticated, don't show login form (will redirect above)
+  if (user && token) {
+    return <LoadingScreen message="Redirecting..." />;
   }
+
+  const isLoading = googleAuth.isLoading || plexAuth.isLoading;
 
   // Show login form
   return (
     <LoginForm
-      onGoogleLogin={handleGoogleLogin}
+      onGoogleLogin={googleAuth.handleGoogleLogin}
+      onPlexLogin={plexAuth.handlePlexLogin}
       isLoading={isLoading}
     />
   );

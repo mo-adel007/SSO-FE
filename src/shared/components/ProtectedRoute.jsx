@@ -1,7 +1,6 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../features/auth/hooks/useAuth";
-import { ROUTES } from "../constants";
 
 const LoadingSpinner = () => (
   <div className="min-h-screen flex items-center justify-center">
@@ -12,19 +11,15 @@ const LoadingSpinner = () => (
   </div>
 );
 
-const ProtectedRoute = ({ children, requiredRole }) => {
-  const { user, loading, isAuthenticated } = useAuth();
+const ProtectedRoute = ({ children,  }) => {
+  const {loading, isAuthenticated } = useAuth();
 
   if (loading) {
     return <LoadingSpinner />;
   }
 
   if (!isAuthenticated) {
-    return <Navigate to={ROUTES.LOGIN} replace />;
-  }
-
-  if (requiredRole && user.role !== requiredRole) {
-    return <Navigate to={ROUTES.DASHBOARD} replace />;
+    return <Navigate to='/login' replace />;
   }
 
   return children;

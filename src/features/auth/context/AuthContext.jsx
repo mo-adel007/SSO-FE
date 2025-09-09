@@ -1,5 +1,4 @@
 import React, { createContext, useState, useEffect, useCallback } from "react";
-import { API_ENDPOINTS } from "../../../shared/constants";
 
 export const AuthContext = createContext();
 
@@ -18,7 +17,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.AUTH.ME}`, {
+      const response = await fetch(`${API_BASE_URL}/auth/me`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 
@@ -39,17 +38,19 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  // Login function
-  const login = useCallback((authToken) => {
+  // AuthContext.js
+  const login = useCallback((authToken, userData) => {
     setToken(authToken);
+    setUser(userData);
     localStorage.setItem("token", authToken);
+    localStorage.setItem("user", JSON.stringify(userData));
   }, []);
 
-  // Logout function
   const logout = useCallback(() => {
     setToken(null);
     setUser(null);
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
   }, []);
 
   // Fetch user when token changes
@@ -66,9 +67,5 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: !!user,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

@@ -1,29 +1,26 @@
-import { useEffect } from "react";
+import { useEffect, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 const AuthCallback = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { login } = useContext(AuthContext);
 
   useEffect(() => {
     const handleCallback = async () => {
       const token = searchParams.get("token");
       const error = searchParams.get("error");
 
-      // Handle authentication error
       if (error) {
         toast.error(decodeURIComponent(error));
-        navigate("/", { replace: true });
+        navigate("/login", { replace: true });
         return;
       }
 
       if (token) {
         try {
-          // Store the token
-          localStorage.setItem("authToken", token);
-
-          // Get user info from the token by calling /auth/me
           const response = await fetch(
             `${import.meta.env.VITE_API_URL}/auth/me`,
             {
@@ -33,35 +30,27 @@ const AuthCallback = () => {
               },
             }
           );
-
           if (response.ok) {
             const userData = await response.json();
-
-            // Store user info temporarily to pass to the main page
-            localStorage.setItem("tempUserInfo", JSON.stringify(userData));
-
-            toast.success("Successfully logged in with Google!");
-
-            // Navigate to home page with success flag
-            navigate("/?loginSuccess=true", { replace: true });
+            login(token, userData); // update context immediately
+            toast.success("Successfully signed in!");
+            navigate("/dashboard", { replace: true });
           } else {
             throw new Error("Failed to get user information");
           }
         } catch (error) {
           console.error("Auth callback error:", error);
           toast.error("Authentication failed");
-          localStorage.removeItem("authToken");
-          navigate("/", { replace: true });
+          navigate("/login", { replace: true });
         }
       } else {
         toast.error("No authentication token received");
-        navigate("/", { replace: true });
+        navigate("/login", { replace: true });
       }
     };
 
     handleCallback();
   }, [searchParams, navigate]);
-
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">

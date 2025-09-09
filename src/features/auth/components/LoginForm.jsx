@@ -1,5 +1,5 @@
-import React from 'react';
-import { Shield } from 'lucide-react';
+import React from "react";
+import { Shield } from "lucide-react";
 
 const GoogleIcon = () => (
   <svg
@@ -26,7 +26,33 @@ const GoogleIcon = () => (
   </svg>
 );
 
-const LoginForm = ({ onGoogleLogin, isLoading }) => {
+// Official Plex logo (yellow play triangle)
+// Combined Plex (yellow triangle) and Rockwell Automation (red hex RA) icon
+const PlexRockwellIcon = () => (
+  <span className="flex items-center gap-1">
+    <polygon fill="#E5A00D" points="8,4 8,28 24,16" />
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 20 20"
+      className="h-4 w-4"
+    >
+      <polygon fill="#C8102E" points="10,1 19,5.5 19,14.5 10,19 1,14.5 1,5.5" />
+      <text
+        x="50%"
+        y="62%"
+        textAnchor="middle"
+        fontSize="7"
+        fontWeight="bold"
+        fill="#fff"
+        fontFamily="Arial, sans-serif"
+      >
+        RA
+      </text>
+    </svg>
+  </span>
+);
+
+const LoginForm = ({ onGoogleLogin, onPlexLogin, isLoading }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -34,23 +60,42 @@ const LoginForm = ({ onGoogleLogin, isLoading }) => {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl shadow-lg mb-6">
             <Shield className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to SSO Portal</h1>
-          <p className="text-gray-600">Sign in with your Google account</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Welcome to SSO Portal
+          </h1>
+          <p className="text-gray-600">Sign in with your preferred account</p>
         </div>
 
         <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8">
-          <button
-            onClick={onGoogleLogin}
-            disabled={isLoading}
-            className="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-300 rounded-2xl px-6 py-3.5 text-gray-700 font-medium hover:border-gray-400 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 group disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-          >
-            {isLoading ? (
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-600"></div>
-            ) : (
-              <GoogleIcon />
-            )}
-            {isLoading ? "Redirecting to Google..." : "Continue with Google"}
-          </button>
+          <div className="space-y-4">
+            <button
+              onClick={onGoogleLogin}
+              disabled={isLoading}
+              className="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-300 rounded-2xl px-6 py-3.5 text-gray-700 font-medium hover:border-gray-400 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 group disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            >
+              {isLoading ? (
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-600"></div>
+              ) : (
+                <GoogleIcon />
+              )}
+              {isLoading ? "Redirecting to Google..." : "Continue with Google"}
+            </button>
+
+            <button
+              onClick={onPlexLogin}
+              disabled={isLoading}
+              className="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-300 rounded-2xl px-6 py-3.5 text-gray-700 font-medium hover:border-gray-400 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 group disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            >
+              {isLoading ? (
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-600"></div>
+              ) : (
+                <PlexRockwellIcon />
+              )}
+              {isLoading
+                ? "Redirecting to Plex..."
+                : "Continue with Plex (by Rockwell Automation)"}
+            </button>
+          </div>
 
           <div className="mt-6 text-center">
             <p className="text-xs text-gray-500">

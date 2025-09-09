@@ -1,13 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Shield, LogOut } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 
-const LoginSuccess = ({ userInfo, authToken, onReset }) => {
+const LoginSuccess = () => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const navigate = useNavigate();
+  const { user, token, logout } = useAuth();
+
+  useEffect(() => {
+    if (!token || !user) {
+      navigate('/login', { replace: true });
+    }
+  }, [token, user, navigate]);
 
   const handleCopyToken = () => {
-    navigator.clipboard.writeText(authToken);
-    toast.success('Token copied to clipboard!');
+    if (token) {
+      navigator.clipboard.writeText(token);
+      toast.success('Token copied to clipboard!');
+    }
   };
 
   const handleLogout = async () => {
@@ -17,7 +29,7 @@ const LoginSuccess = ({ userInfo, authToken, onReset }) => {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${authToken}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
@@ -33,16 +45,13 @@ const LoginSuccess = ({ userInfo, authToken, onReset }) => {
       // Still proceed with client-side logout even if backend fails
       toast.success('Logged out successfully!');
     } finally {
-      // Remove token from localStorage and reset state
-      localStorage.removeItem('authToken');
-      onReset();
+      logout();
       setIsLoggingOut(false);
     }
   };
 
   const handleTryAgain = () => {
-    localStorage.removeItem('authToken');
-    onReset();
+    logout();
   };
 
   return (
@@ -77,25 +86,25 @@ const LoginSuccess = ({ userInfo, authToken, onReset }) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Welcome, {userInfo.name}!</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Welcome, {user?.name || "Unknown"}!</h2>
           </div>
           
           <div className="space-y-4">
             <div className="bg-green-500 rounded-lg p-4">
               <h3 className="text-sm font-medium text-gray-700 mb-2">User Information</h3>
               <div className="space-y-2">
-                <p className="text-sm"><span className="font-medium">Name:</span> {userInfo.name}</p>
-                <p className="text-sm"><span className="font-medium">Email:</span> {userInfo.email}</p>
-                <p className="text-sm"><span className="font-medium">User ID:</span> {userInfo.id}</p>
+                <p className="text-sm"><span className="font-medium">Name:</span> {user?.name || "Unknown"}</p>
+                <p className="text-sm"><span className="font-medium">Email:</span> {user?.email || "N/A"}</p>
+                <p className="text-sm"><span className="font-medium">User ID:</span> {user?.id || "N/A"}</p>
               </div>
             </div>
             
-            {authToken && (
+            {token && (
               <div className="bg-blue-50 rounded-lg p-4">
                 <h3 className="text-sm font-medium text-blue-700 mb-2">Authentication Token</h3>
                 <div className="bg-white rounded border p-3">
                   <code className="text-xs text-gray-800 break-all font-mono">
-                    {authToken}
+                    {token}
                   </code>
                 </div>
                 <p className="text-xs text-blue-600 mt-2">This token is stored in localStorage and can be used for API calls</p>

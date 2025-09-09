@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
-import { API_ENDPOINTS } from '../../../shared/constants';
 import toast from 'react-hot-toast';
 
 export const useGoogleAuth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
   const [loginSuccess, setLoginSuccess] = useState(false);
-  const [userInfo, setUserInfo] = useState(null);
+  // Remove userInfo state
   const [authToken, setAuthToken] = useState(null);
 
   // Check for existing auth token and OAuth callback when component mounts
@@ -29,59 +28,21 @@ export const useGoogleAuth = () => {
       
       // Handle successful authentication from OAuth callback
       if (loginSuccessFlag === 'true') {
-        try {
-          // Get the temporarily stored user info and token
-          const tempUserInfo = localStorage.getItem('tempUserInfo');
-          const token = localStorage.getItem('authToken');
-          
-          if (tempUserInfo && token) {
-            const userData = JSON.parse(tempUserInfo);
-            setAuthToken(token);
-            setUserInfo(userData);
-            setLoginSuccess(true);
-            
-            // Clean up temporary storage
-            localStorage.removeItem('tempUserInfo');
-            
-            // Clean up the URL
-            window.history.replaceState({}, document.title, '/');
-          }
-        } catch (error) {
-          console.error('Error processing OAuth callback:', error);
-          toast.error('Failed to process authentication');
-          localStorage.removeItem('tempUserInfo');
-          localStorage.removeItem('authToken');
+        const token = localStorage.getItem('token');
+        if (token) {
+          setAuthToken(token);
+          setLoginSuccess(true);
+          window.history.replaceState({}, document.title, '/');
         }
         setIsInitializing(false);
         return;
       }
 
       // Check for existing token in localStorage (returning user)
-      const existingToken = localStorage.getItem('authToken');
+      const existingToken = localStorage.getItem('token');
       if (existingToken) {
-        try {
-          // Verify token with backend
-          const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, {
-            headers: {
-              'Authorization': `Bearer ${existingToken}`,
-              'Content-Type': 'application/json',
-            },
-          });
-
-          if (response.ok) {
-            const userData = await response.json();
-            setAuthToken(existingToken);
-            setUserInfo(userData);
-            setLoginSuccess(true);
-            toast.success('Welcome back!');
-          } else {
-            // Token is invalid, remove it
-            localStorage.removeItem('authToken');
-          }
-        } catch (error) {
-          console.error('Auth verification error:', error);
-          localStorage.removeItem('authToken');
-        }
+        setAuthToken(existingToken);
+        setLoginSuccess(true);
       }
       
       setIsInitializing(false);
@@ -94,7 +55,7 @@ export const useGoogleAuth = () => {
     setIsLoading(true);
     try {
       // Get Google OAuth URL from backend
-      const response = await fetch(`${import.meta.env.VITE_API_URL}${API_ENDPOINTS.AUTH.GOOGLE}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/google/url`);
       
       if (!response.ok) {
         throw new Error("Failed to get Google OAuth URL");
@@ -116,19 +77,17 @@ export const useGoogleAuth = () => {
 
   const resetAuth = () => {
     setLoginSuccess(false);
-    setUserInfo(null);
     setAuthToken(null);
     setIsLoading(false);
     setIsInitializing(false);
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('tempUserInfo');
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
   };
 
   return {
     isLoading,
     isInitializing,
     loginSuccess,
-    userInfo,
     authToken,
     handleGoogleLogin,
     resetAuth
