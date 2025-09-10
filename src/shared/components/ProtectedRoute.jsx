@@ -11,7 +11,7 @@ const LoadingSpinner = () => (
   </div>
 );
 
-const ProtectedRoute = ({ children,  }) => {
+const ProtectedRoute = ({ children  }) => {
   const {loading, isAuthenticated } = useAuth();
 
   if (loading) {

@@ -41,7 +41,9 @@ export const AuthProvider = ({ children }) => {
         method: 'POST',
         credentials: 'include',
       });
-    } catch {}
+    } catch {
+      toast.error("Logout request failed");
+    }
     setUser(null);
   }, []);
 

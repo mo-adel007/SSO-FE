@@ -1,9 +1,10 @@
+
 import { useAuth } from '../hooks/useAuth';
 import { useGoogleAuth } from '../hooks/useGoogleAuth';
 import { usePlexAuth } from '../hooks/usePlexAuth';
 import LoginForm from '../components/LoginForm';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import LoadingScreen from '../../../shared/components/LoadingScreen';
 
 const Login = () => {
@@ -11,6 +12,8 @@ const Login = () => {
   const navigate = useNavigate();
   const googleAuth = useGoogleAuth();
   const plexAuth = usePlexAuth();
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [plexLoading, setPlexLoading] = useState(false);
 
   // If user is already authenticated, redirect to dashboard
   useEffect(() => {
@@ -19,8 +22,7 @@ const Login = () => {
     }
   }, [loading, user, navigate]);
 
-  // Check if either auth method is initializing
-  if (loading || googleAuth.isInitializing || plexAuth.isInitializing) {
+  if (loading) {
     return <LoadingScreen message="Checking authentication..." />;
   }
 
@@ -29,14 +31,31 @@ const Login = () => {
     return <LoadingScreen message="Redirecting..." />;
   }
 
-  const isLoading = googleAuth.isLoading || plexAuth.isLoading;
+  // Button click handlers to manage individual loading states
+  const handleGoogleLogin = async () => {
+    setGoogleLoading(true);
+    try {
+      await googleAuth.handleGoogleLogin();
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
 
-  // Show login form
+  const handlePlexLogin = async () => {
+    setPlexLoading(true);
+    try {
+      await plexAuth.handlePlexLogin();
+    } finally {
+      setPlexLoading(false);
+    }
+  };
+
   return (
     <LoginForm
-      onGoogleLogin={googleAuth.handleGoogleLogin}
-      onPlexLogin={plexAuth.handlePlexLogin}
-      isLoading={isLoading}
+      onGoogleLogin={handleGoogleLogin}
+      onPlexLogin={handlePlexLogin}
+      googleLoading={googleLoading}
+      plexLoading={plexLoading}
     />
   );
 };
