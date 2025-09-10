@@ -26,15 +26,12 @@ const GoogleIcon = () => (
   </svg>
 );
 
-// Official Plex logo (yellow play triangle)
-// Combined Plex (yellow triangle) and Rockwell Automation (red hex RA) icon
 const PlexRockwellIcon = () => (
   <span className="flex items-center gap-1">
-    <polygon fill="#E5A00D" points="8,4 8,28 24,16" />
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 20 20"
-      className="h-4 w-4"
+      className="h-8 w-8"
     >
       <polygon fill="#C8102E" points="10,1 19,5.5 19,14.5 10,19 1,14.5 1,5.5" />
       <text
@@ -54,14 +51,20 @@ const PlexRockwellIcon = () => (
 
 const LoginForm = ({ onGoogleLogin, onPlexLogin, isLoading }) => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 flex items-center justify-center p-4">
+    <div className="min-h-screen from-blue-50 via-indigo-50 to-purple-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl shadow-lg mb-6">
-            <Shield className="w-8 h-8 text-white" />
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-emerald-600 to-purple-600 rounded-3xl shadow-lg mb-6 animate-shield-glow">
+              <Shield className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome to SSO Portal
+          <img
+            src="/logo.png"
+            alt="GNS Logo"
+            className="mx-auto mb-4 w-30 h-20 object-contain drop-shadow-lg"
+            draggable="false"
+          />
+          <h1 className="text-3xl font-bold text-gray-900 mb-2 ">
+            Welcome to GNS Portal
           </h1>
           <p className="text-gray-600">Sign in with your preferred account</p>
         </div>
