@@ -49,7 +49,7 @@ const PlexRockwellIcon = () => (
   </span>
 );
 
-const LoginForm = ({ onGoogleLogin, onPlexLogin, isLoading }) => {
+const LoginForm = ({ onGoogleLogin, onPlexLogin, googleLoading, plexLoading }) => {
   return (
     <div className="min-h-screen from-blue-50 via-indigo-50 to-purple-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -73,28 +73,28 @@ const LoginForm = ({ onGoogleLogin, onPlexLogin, isLoading }) => {
           <div className="space-y-4">
             <button
               onClick={onGoogleLogin}
-              disabled={isLoading}
+              disabled={googleLoading}
               className="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-300 rounded-2xl px-6 py-3.5 text-gray-700 font-medium hover:border-gray-400 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 group disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
-              {isLoading ? (
+              {googleLoading ? (
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-600"></div>
               ) : (
                 <GoogleIcon />
               )}
-              {isLoading ? "Redirecting to Google..." : "Continue with Google"}
+              {googleLoading ? "Redirecting to Google..." : "Continue with Google"}
             </button>
 
             <button
               onClick={onPlexLogin}
-              disabled={isLoading}
+              disabled={plexLoading}
               className="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-300 rounded-2xl px-6 py-3.5 text-gray-700 font-medium hover:border-gray-400 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 group disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
-              {isLoading ? (
+              {plexLoading ? (
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-600"></div>
               ) : (
                 <PlexRockwellIcon />
               )}
-              {isLoading
+              {plexLoading
                 ? "Redirecting to Plex..."
                 : "Continue with Plex (by Rockwell Automation)"}
             </button>

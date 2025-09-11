@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const response = await fetch(`${API_BASE_URL}/auth/session/me`, {
-        credentials: 'include',
+        credentials: "include",
       });
       if (response.ok) {
         const userData = await response.json();
@@ -38,12 +38,14 @@ export const AuthProvider = ({ children }) => {
   const logout = useCallback(async () => {
     try {
       await fetch(`${API_BASE_URL}/auth/logout`, {
-        method: 'POST',
-        credentials: 'include',
+        method: "POST",
+        credentials: "include",
       });
     } catch {
       toast.error("Logout request failed");
     }
+    localStorage.clear();
+    // cookieStore.clear()
     setUser(null);
   }, []);
 
